@@ -3,12 +3,7 @@
 # leon.strand@medeanalytics.com
 
 
-nodes='
-192.168.1.57
-192.168.1.77
-192.168.1.118
-192.168.1.251
-'
+nodes=$(cat ~/docker-elk-control/elasticsearch.cluster_hosts.txt)
 
 execute() {
   echo $@
