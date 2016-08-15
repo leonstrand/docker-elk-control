@@ -6,6 +6,7 @@
 cpu_usage_threshold=7
 check_passed_threshold=15
 alerts=10
+containers_up_threshold=4
 
 check() {
   check_passed=0
@@ -13,37 +14,50 @@ check() {
   netcat_notified=0
   curl_notified=0
   while :; do 
-    if [ "$(docker ps -q -f 'name=dockerelk_*' | wc -l)" -ne 4 ]; then
+    containers_up=$(docker ps -q -f 'name=dockerelk_*' | wc -l)
+    if [ "$containers_up" -lt $containers_up_threshold ]; then
       echo
-      echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): not all containers up yet
-      docker ps -a
+      echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): $containers_up of $containers_up_threshold containers up
+      echo docker ps -af name=dockerelk_\\*
+      docker ps -af name=dockerelk_\*
       sleep 1
       continue
     fi
     if [ $container_notified -ne 1 ]; then
       echo
       echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): all containers up
-      docker ps -a
+      echo docker ps -af name=dockerelk_\\*
+      docker ps -af name=dockerelk_\*
       container_notified=1
+      echo
     fi
     if nc -w1 localhost 9200; then
       if [ $netcat_notified -ne 1 ]; then
         echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): connection to localhost:9200 succeeded
+        echo nc -vw1 localhost 9200
+        nc -vw1 localhost 9200
+        echo
         netcat_notified=1
       fi
     else
       echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): connection to localhost:9200 failed
+      echo nc -w1 localhost 9200
       sleep 1
       continue
     fi
     if curl --connect-timeout 1 localhost:9200/_cat/indices?v 1>/dev/null 2>&1; then
       if [ $curl_notified -ne 1 ]; then
-        echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): curl --connect-timeout 1 localhost:9200/_cat/indices?v
+        #echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): curl --connect-timeout 1 localhost:9200/_cat/indices?v
+        echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): elasticsearch indices curl succeeded
+        echo curl --connect-timeout 1 localhost:9200/_cat/indices?v
         curl --connect-timeout 1 localhost:9200/_cat/indices?v
         curl_notified=1
+        echo
+        echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): checking cpu usage
       fi
     else
-      echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): curl failed
+      echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): elasticsearch indices curl failed
+      echo curl --connect-timeout 1 localhost:9200/_cat/indices?v
       sleep 1
       continue
     fi
@@ -86,12 +100,14 @@ check() {
       #echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): condition reached $check_passed of $check_passed_threshold times in a row needed to alert
     fi
     if [ $check_passed -eq $check_passed_threshold ]; then
+      echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): cpu usage check passed
       break
     fi
     sleep 1
   done
 }
 alert() {
+  echo
   echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): alerting
   for i in $(seq $alerts); do
     echo -ne '\a'
