@@ -3,10 +3,10 @@
 # leon.strand@medeanalytics.com
 
 
-user='lstrand'
-echo $0: user: $user #debug
+#user='lstrand'
+#echo $0: user: $user #debug
 # first ip address that isn't the loopback interface or any docker interfaces
-self=$(ip address show $(ip address show | grep '^[1-9]' | egrep -v 'lo|docker' | head -1 | cut -d' ' -f2 | tr -d :) | grep 'inet ' | awk '{print $2}' | cut -d/ -f1)
+self=$(for interface in $(ip link | grep -v link | awk '{print $2}' | egrep -v 'lo|docker' | tr -d :); do if ifconfig $interface | grep -q inet\ ; then break; fi; done; ifconfig $interface | grep inet\  | awk '{print $2}')
 echo $0: self: $self #debug
 containers='
 elasticsearch
@@ -21,7 +21,7 @@ kibana
 for container in $containers; do
   #echo #debug
   echo $0: container: $container #debug
-  file=/home/$user/docker-elk/$container/config/elasticsearch.yml
+  file=~/docker-elk/$container/config/elasticsearch.yml
   echo $0: file: $file #debug
   #network.publish_host: 192.168.1.57
   sed -i 's/^\(network.publish_host: \).*$/\1'$self'/' $file
