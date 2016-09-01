@@ -26,6 +26,10 @@ volumes() {
     echo $0: time docker volume ls -qf dangling=true \| xargs -r docker volume rm
     time docker volume ls -qf dangling=true | xargs -r docker volume rm
   fi
+  if [ -e /elk/elasticsearch ]; then
+    echo $0: sudo rm -rv /elk/elasticsearch
+    sudo rm -rv /elk/elasticsearch
+  fi
 }
 
 containers() {
