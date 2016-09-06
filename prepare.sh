@@ -32,7 +32,6 @@ else
     echo $0: no hosts provided on command line, checking $file
     if [ -s $file ]; then
       echo $0: setting elasticsearch cluster hosts using elasticsearch cluster hosts file $file
-      hosts=$(grep -v $self $file)
     else
       echo $0: could not determine elasticsearch cluster hosts to set discovery.zen.ping.unicast.hosts
       echo $0: must provide at least one host to enable elasticsearch cluster
@@ -56,7 +55,6 @@ for container in $containers; do
   if [ $container == 'elasticsearch' ]; then
     discovery_zen_ping_unicast_hosts=$discovery_zen_ping_unicast_hosts'elasticsearchloadbalancer'
   else
-    discovery_zen_ping_unicast_hosts=$discovery_zen_ping_unicast_hosts$self
     for host in $hosts; do
         discovery_zen_ping_unicast_hosts=$discovery_zen_ping_unicast_hosts'", "'$host'", "'$host':9301'
     done
