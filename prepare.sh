@@ -3,10 +3,9 @@
 # leon.strand@medeanalytics.com
 
 
-# set self ip address
-# first ip address that isn't the loopback interface or any docker interfaces
+# set self ip address to first ip address that isn't the loopback interface or any docker interface
 self=$(for interface in $(ip link | grep -v link | awk '{print $2}' | egrep -v 'lo|docker' | tr -d :); do if ifconfig $interface | grep -q inet\ ; then break; fi; done; ifconfig $interface | grep inet\  | awk '{print $2}')
-echo $0: self: $self #debug
+echo $0: self: $self
 
 containers='
 elasticsearch
@@ -43,14 +42,12 @@ else
 fi
 
 for container in $containers; do
-  #echo #debug
-  echo $0: container: $container #debug
+  echo $0: container: $container
   file=~/docker-elk/$container/config/elasticsearch.yml
-  echo $0: file: $file #debug
+  echo $0: file: $file
   #network.publish_host: 192.168.1.57
   sed -i 's/^\(network.publish_host: \).*$/\1'$self'/' $file
 
-  #echo #debug
   discovery_zen_ping_unicast_hosts='["'
   if [ $container == 'elasticsearch' ]; then
     discovery_zen_ping_unicast_hosts=$discovery_zen_ping_unicast_hosts'elasticsearchloadbalancer'
@@ -60,12 +57,9 @@ for container in $containers; do
     done
   fi
   discovery_zen_ping_unicast_hosts=$discovery_zen_ping_unicast_hosts'"]'
-  #echo $0: discovery_zen_ping_unicast_hosts: $discovery_zen_ping_unicast_hosts #debug
-  # elasticsearch: discovery.zen.ping.unicast.hosts: ["192.168.1.57:9301", "192.168.1.118", "192.168.1.118:9301"]
   # elasticsearchloadbalancer: discovery.zen.ping.unicast.hosts: ["192.168.1.57", "192.168.1.118", "192.168.1.118:9301"]
   sed -i 's/^\(discovery.zen.ping.unicast.hosts: \).*$/\1'"$discovery_zen_ping_unicast_hosts"'/' $file
 
-  #echo #debug
   echo $0: egrep \'network.publish_host\|discovery.zen.ping.unicast.hosts\' $file
   egrep 'network.publish_host|discovery.zen.ping.unicast.hosts' $file
 done
