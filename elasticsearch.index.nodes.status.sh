@@ -19,6 +19,17 @@ printf '%s %19s %12s\n' 'total documents excluding kibana' $docs_count $docs_del
 
 
 echo
+echo -e index\\t\\t\\tes\\tfile
+while read index size; do
+  index_elasticsearch=$index
+  index=$(echo $index | cut -d- -f2)
+  index=$(echo $index | sed 's/\.//g')
+  size_file=$(du -csh $(find /pai-logs -type f -name \*$index\*) | grep total | awk '{print $1}')
+  echo -e $index_elasticsearch\\t$size\\t$size_file
+done < <(curl -sS localhost:9200/_cat/indices?v | grep logstash | awk '{print $3, $NF}')
+
+
+echo
 command='curl -sS localhost:9200/_cluster/state/version,master_node?pretty'
 execute $command
 
