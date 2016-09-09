@@ -8,17 +8,17 @@ template=./input-file-logstash.conf
 container='dockerelk_logstash_1'
 
 set_date() {
-date="$1"
-if [ -n "$date" ]; then
-  date=$(echo $date | sed 's/-//g')
-  date=$(echo $date | sed 's/\.//g')
-else
-  echo $0: error: no date provided
-  echo $0: usage: $0 YYYY-MM-DD
-  echo $0: purpose: prompt logstash to input all events from a date again
-  echo $0: example: $0 2016-09-01
-  exit 1
-fi
+  date="$1"
+  if [ -n "$date" ]; then
+    date=$(echo $date | sed 's/-//g')
+    date=$(echo $date | sed 's/\.//g')
+  else
+    echo $0: error: no date provided
+    echo $0: usage: $0 YYYY-MM-DD
+    echo $0: purpose: prompt logstash to input all events from a date again
+    echo $0: example: $0 2016-09-01
+    exit 1
+  fi
 }
 
 find_first_logstash_configuration_file() {
