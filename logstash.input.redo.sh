@@ -27,6 +27,7 @@ logstash_file_sequence=$(echo $logstash_file | cut -d- -f1)
 logstash_file_sequence=$(expr $logstash_file_sequence - 1)
 logstash_file_sequence=$(printf "%02d\n" $logstash_file_sequence)
 logstash_file=$(echo $logstash_file | sed 's/^[0-9]\+\(-.*\)$/'$logstash_file_sequence'\1/')
+logstash_file=$(echo $logstash_file | sed 's/^\(.*\)\(-logstash.conf\)$/\1-'$date'\2/')
 echo new logstash file: $logstash_file
 
 # stream updated template to new logstash configuration file
