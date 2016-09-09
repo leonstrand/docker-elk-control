@@ -26,7 +26,7 @@ while read index size; do
   index=$(echo $index | sed 's/\.//g')
   size_file=$(du -csh $(find /pai-logs -type f -name \*$index\*) | grep total | awk '{print $1}')
   echo -e $index_elasticsearch\\t$size\\t$size_file
-done < <(curl -sS localhost:9200/_cat/indices?v | grep logstash | awk '{print $3, $NF}')
+done < <(curl -sS localhost:9200/_cat/indices?v | grep logstash | awk '{print $3, $NF}' | sort)
 
 
 echo
