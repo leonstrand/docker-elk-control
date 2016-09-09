@@ -10,11 +10,12 @@ container='dockerelk_logstash_1'
 set_date() {
   echo
   echo
-  echo $0: stage 1 of 6: setting date
+  echo $0: stage 1 of 6: setting date from input
   date="$1"
   if [ -n "$date" ]; then
     date=$(echo $date | sed 's/-//g')
     date=$(echo $date | sed 's/\.//g')
+    echo $0: date: $date
   else
     echo $0: error: no date provided
     echo $0: usage: $0 YYYY-MM-DD
@@ -58,19 +59,22 @@ delete_elasticsearch_index() {
   echo $0: stage 5 of 6: deleting elasticsearch index
   # YYYYMMDD to YYYY.MM.DD
   date=$(echo $date | sed 's/^\([0-9][0-9][0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1.\2.\3/')
-  echo $0: date: $date
   elasticsearch_index='logstash-'$date
   echo $0: elasticsearch_index: $elasticsearch_index
-  time ~/docker-elk-control/elasticsearch.index.delete.sh foo
+  echo ~/docker-elk-control/elasticsearch.index.delete.sh $date
+  ~/docker-elk-control/elasticsearch.index.delete.sh $date
 }
 
 erase_logstash_sincedb() {
   echo
   echo
   echo $0: stage 6 of 6: erasing logstash sincedb
-  time docker cp ~/docker-elk-control/logstash.sincedb.erase.sh $container:/
-  time docker exec $container /logstash.sincedb.erase.sh
-  time docker exec $container rm -v /logstash.sincedb.erase.sh
+  echo docker cp ~/docker-elk-control/logstash.sincedb.erase.sh $container:/
+  docker cp ~/docker-elk-control/logstash.sincedb.erase.sh $container:/
+  echo docker exec $container /logstash.sincedb.erase.sh
+  docker exec $container /logstash.sincedb.erase.sh
+  echo docker exec $container rm -v /logstash.sincedb.erase.sh
+  docker exec $container rm -v /logstash.sincedb.erase.sh
 }
 
 
