@@ -22,22 +22,22 @@ fi
 }
 
 find_first_logstash_configuration_file() {
-logstash_file=$(basename $(find $directory -type f | sort | head -1))
-echo first logstash file: $logstash_file
+  logstash_file=$(basename $(find $directory -type f | sort | head -1))
+  echo first logstash file: $logstash_file
 }
 
 create_preceding_logstash_configuration_file_name() {
-logstash_file_sequence=$(echo $logstash_file | cut -d- -f1)
-logstash_file_sequence=$(expr $logstash_file_sequence - 1)
-logstash_file_sequence=$(printf "%02d\n" $logstash_file_sequence)
-logstash_file=$(echo $logstash_file | sed 's/^[0-9]\+\(-.*\)$/'$logstash_file_sequence'\1/')
-logstash_file=$(echo $logstash_file | sed 's/^\(.*\)\(-logstash.conf\)$/\1-'$date'\2/')
-echo new logstash file: $logstash_file
+  logstash_file_sequence=$(echo $logstash_file | cut -d- -f1)
+  logstash_file_sequence=$(expr $logstash_file_sequence - 1)
+  logstash_file_sequence=$(printf "%02d\n" $logstash_file_sequence)
+  logstash_file=$(echo $logstash_file | sed 's/^[0-9]\+\(-.*\)$/'$logstash_file_sequence'\1/')
+  logstash_file=$(echo $logstash_file | sed 's/^\(.*\)\(-logstash.conf\)$/\1-'$date'\2/')
+  echo new logstash file: $logstash_file
 }
 
 stream_updated_template_to_preceding_logstash_configuration_file() {
-#sed 's/XXXXXXXX/'$date'/' $template
-sed 's/XXXXXXXX/'$date'/' $template | tee $directory/$logstash_file
+  #sed 's/XXXXXXXX/'$date'/' $template
+  sed 's/XXXXXXXX/'$date'/' $template | tee $directory/$logstash_file
 }
 
 delete_elasticsearch_index() {
