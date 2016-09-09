@@ -44,9 +44,9 @@ delete_elasticsearch_index() {
   # build elasticsearch index name
   date=$(echo $date | sed 's/^\([0-9][0-9][0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1.\2.\3/')
   echo $0: date: $date
-  elasticsearch_index=logstash-$date
+  elasticsearch_index='logstash-'$date
   echo $0: elasticsearch_index: $elasticsearch_index
-  #time ~/docker-elk-control/elasticsearch.index.delete.sh foo
+  time ~/docker-elk-control/elasticsearch.index.delete.sh foo
 }
 
 erase_logstash_sincedb() {
