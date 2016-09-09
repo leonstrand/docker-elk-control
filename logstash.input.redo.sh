@@ -56,7 +56,7 @@ delete_elasticsearch_index() {
   echo
   echo
   echo $0: stage 5 of 6: deleting elasticsearch index
-  # build elasticsearch index name
+  # YYYYMMDD to YYYY.MM.DD
   date=$(echo $date | sed 's/^\([0-9][0-9][0-9][0-9]\)\([0-9][0-9]\)\([0-9][0-9]\)$/\1.\2.\3/')
   echo $0: date: $date
   elasticsearch_index='logstash-'$date
