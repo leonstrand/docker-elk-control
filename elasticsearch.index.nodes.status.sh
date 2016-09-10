@@ -19,6 +19,7 @@ printf '%s %19s %12s\n' 'total documents excluding kibana' $docs_count $docs_del
 
 
 echo
+echo $0: storage usage
 echo -e index\\t\\t\\tes\\tfile
 while read index size; do
   index_elasticsearch=$index
