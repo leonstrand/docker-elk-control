@@ -56,6 +56,7 @@ check() {
 }
 alert() {
   echo
+  echo
   echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): alerting
   echo
   time top -bn1 -p $(pgrep -d, -f jvm) | tee >(mailx -v -s "$mail_subject" -r $mail_sender $mail_recipient)
