@@ -8,6 +8,9 @@ string=$process' cpu usage'
 cpu_usage_threshold=7
 check_passed_threshold=15
 alerts=10
+mail_sender='leon.strand@medeanalytics.com'
+mail_recipient='leonstrand@gmail.com'
+mail_subject="$string under threshold $cpu_usage_threshold"
 
 check() {
   check_passed=0
@@ -54,10 +57,8 @@ check() {
 alert() {
   echo
   echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): alerting
-  for i in $(seq $alerts); do
-    echo -ne '\a'
-    sleep 1
-  done
+  echo
+  time top -bn1 -p $(pgrep -d, -f jvm) | tee >(mailx -v -s "$mail_subject" -r $mail_sender $mail_recipient)
 }
 
 echo $0: $(date '+%Y-%m-%d %H:%M:%S.%N'): begin
